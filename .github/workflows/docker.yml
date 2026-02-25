@@ -1,0 +1,64 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine tag suffix
+        id: vars
+        run: |
+          if [[ ${{ github.ref }} == refs/tags/v* ]]; then
+            echo "SUFFIX=-${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+            echo "IS_TAG=true" >> $GITHUB_OUTPUT
+          else
+            echo "SUFFIX=" >> $GITHUB_OUTPUT
+            echo "IS_TAG=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push CUDA image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:cuda${{ steps.vars.outputs.SUFFIX }}
+            ${{ steps.vars.outputs.IS_TAG == 'true' && format('ghcr.io/{0}:cuda-latest', github.repository) || '' }}
+          build-args: |
+            RUNTIME=nvidia
+
+      - name: Build and push CPU image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:cpu${{ steps.vars.outputs.SUFFIX }}
+            ${{ steps.vars.outputs.IS_TAG == 'true' && format('ghcr.io/{0}:cpu-latest', github.repository) || '' }}
+          build-args: |
+            RUNTIME=cpu
