@@ -5,15 +5,10 @@ fastapi
 uvicorn[standard]
 
 # KittenTTS Core Dependencies
-onnxruntime
-soundfile
-numpy
-huggingface_hub
-phonemizer
-misaki[en]>=0.9.4
-espeakng_loader==0.2.0
+# Install from GitHub releases (version 0.8.1)
+kittentts @ https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl
 
-# Configuration & Utilities
+# Additional Utilities
 PyYAML
 python-multipart
 requests
@@ -23,7 +18,6 @@ aiofiles
 unidecode
 inflect
 tqdm
-hf-transfer
 pydub
 librosa
 praat-parselmouth

@@ -45,7 +45,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "log_file_backup_count": 5,  # Number of backup log files to keep.
     },
     "model": {  # Updated section for model source configuration
-        "repo_id": "KittenML/kitten-tts-nano-0.1",  # KittenTTS Hugging Face repository ID
+        "repo_id": "KittenML/kitten-tts-micro-0.8",  # KittenTTS Hugging Face repository ID
     },
     "tts_engine": {
         "device": "auto",  # TTS processing device: 'auto', 'cuda', or 'cpu'.
@@ -69,7 +69,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     },
     "ui_state": {  # Stores user interface preferences and last-used values.
         "last_text": "",  # Last text entered by the user.
-        "last_voice": "expr-voice-5-m",  # Last selected voice.
+        "last_voice": "Bella",  # Last selected voice.
         "last_chunk_size": 120,  # Last used chunk size for text splitting in UI.
         "last_split_text_enabled": True,  # Whether text splitting was last enabled in UI.
         "hide_chunk_warning": False,  # Flag to hide the chunking warning modal.

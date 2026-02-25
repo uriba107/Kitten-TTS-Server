@@ -1,19 +1,13 @@
 # requirements-nvidia.txt (NVIDIA GPU Installation)
 
 # KittenTTS Core Dependencies (GPU Version)
-onnxruntime-gpu
-soundfile
-numpy
-huggingface_hub
-phonemizer
-misaki[en]>=0.9.4
-espeakng_loader==0.2.0
+kittentts>=0.8.1
 
 # Web Framework
 fastapi
 uvicorn[standard]
 
-# Configuration & Utilities
+# Additional Utilities
 PyYAML
 python-multipart
 requests
@@ -23,7 +17,6 @@ aiofiles
 unidecode
 inflect
 tqdm
-hf-transfer
 pydub
 librosa
 praat-parselmouth
