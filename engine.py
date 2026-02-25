@@ -40,10 +40,9 @@ def load_model() -> bool:
 
         logger.info(f"Loading KittenTTS model from: {model_repo_id}")
 
-        device = config_manager.get_string("tts_engine.device", "cpu")
-        logger.info(f"Using device: {device}")
+        logger.info(f"Loading KittenTTS model...")
 
-        kittentts_model = KittenTTS(model_repo_id, device=device)
+        kittentts_model = KittenTTS(model_repo_id)
 
         MODEL_LOADED = True
         logger.info("KittenTTS model loaded successfully.")
