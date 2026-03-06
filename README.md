@@ -2,6 +2,8 @@
 
 **Self-host the ultra-lightweight [KittenTTS model](https://github.com/KittenML/KittenTTS) with this enhanced API server. Features an intuitive Web UI, a flexible API, large text processing for audiobooks, and uniquely, high-performance GPU acceleration.**
 
+This is a duplicate for [devnen/Kitten-TTS-Server](https://github.com/devnen/Kitten-TTS-Server) created to allow publishing of docker images.
+
 This server provides a robust, user-friendly, and powerful interface for the kitten-tts engine, an open-source, realistic text-to-speech model with just 15 million parameters. This project significantly enhances the original model by adding a full-featured server, an easy-to-use UI, and an optimized inference pipeline for hardware ranging from NVIDIA GPUs to CPUs and even the Raspberry Pi 5 (RP5) and Raspberry Pi 4 (RP4).
 
 [![Project Link](https://img.shields.io/badge/GitHub-devnen/Kitten--TTS--Server-blue?style=for-the-badge&logo=github)](https://github.com/devnen/Kitten-TTS-Server)
@@ -27,21 +29,21 @@ The [KittenTTS model by KittenML](https://github.com/KittenML/KittenTTS) provide
 
 We solve the complexity of setting up and running the model by offering:
 
-*   A **modern Web UI** for easy experimentation, preset loading, and speed adjustment.
-*   **True GPU Acceleration** for NVIDIA GPUs, a feature not present in the original implementation.
-*   **Large Text Handling & Audiobook Generation:** Intelligently splits long texts into manageable chunks, processes them sequentially, and seamlessly concatenates the audio. Perfect for creating complete audiobooks.
-*   **A flexible, dual-API system** including a simple endpoint and an OpenAI-compatible endpoint for easy integration.
-*   **Built-in Voices:** A fixed list of 8 ready-to-use voices for consistent and reliable output.
-*   **Cross-platform support** for Windows and Linux, with clear setup instructions.
-*   **Docker support** for easy, reproducible containerized deployment.
+- A **modern Web UI** for easy experimentation, preset loading, and speed adjustment.
+- **True GPU Acceleration** for NVIDIA GPUs, a feature not present in the original implementation.
+- **Large Text Handling & Audiobook Generation:** Intelligently splits long texts into manageable chunks, processes them sequentially, and seamlessly concatenates the audio. Perfect for creating complete audiobooks.
+- **A flexible, dual-API system** including a simple endpoint and an OpenAI-compatible endpoint for easy integration.
+- **Built-in Voices:** A fixed list of 8 ready-to-use voices for consistent and reliable output.
+- **Cross-platform support** for Windows and Linux, with clear setup instructions.
+- **Docker support** for easy, reproducible containerized deployment.
 
 ## 🍓 Raspberry Pi & Edge Device Support
 
 The ultra-lightweight nature of the KittenTTS model and the efficiency of this server make it a perfect candidate for running on single-board computers (SBCs) and other edge devices.
 
-*   ✅ **Raspberry Pi 5 (RP5):** Confirmed to run with **excellent performance**. The server is fast and responsive, easily handling requests from other devices on the same local network (LAN). This makes it ideal for local network services, home automation, and other DIY projects.
+- ✅ **Raspberry Pi 5 (RP5):** Confirmed to run with **excellent performance**. The server is fast and responsive, easily handling requests from other devices on the same local network (LAN). This makes it ideal for local network services, home automation, and other DIY projects.
 
-*   ⏳ **Raspberry Pi 4 (RP4):** Testing is currently in progress. Not working on the 32-bit Raspberry Pi OS.
+- ⏳ **Raspberry Pi 4 (RP4):** Testing is currently in progress. Not working on the 32-bit Raspberry Pi OS.
 
 To install, simply follow the standard **Linux installation guide** provided in this README.
 
@@ -49,9 +51,9 @@ To install, simply follow the standard **Linux installation guide** provided in 
 
 A standout feature of this server is the implementation of **high-performance GPU acceleration**, a capability not available in the original KittenTTS project. While the base model is CPU-only, this server unlocks the full potential of your hardware.
 
-*   **Optimized ONNX Runtime Pipeline:** We leverage `onnxruntime-gpu` to move the entire inference process to your NVIDIA graphics card.
-*   **Eliminated I/O Bottlenecks:** The server uses advanced **I/O Binding**. This technique pre-allocates memory directly on the GPU for both model inputs and outputs, drastically reducing the latency caused by copying data between system RAM and the GPU's VRAM.
-*   **True Performance Gains:** This isn't just running the model on the GPU; it's an optimized pipeline designed to minimize latency and maximize throughput, making real-time generation significantly faster than on CPU.
+- **Optimized ONNX Runtime Pipeline:** We leverage `onnxruntime-gpu` to move the entire inference process to your NVIDIA graphics card.
+- **Eliminated I/O Bottlenecks:** The server uses advanced **I/O Binding**. This technique pre-allocates memory directly on the GPU for both model inputs and outputs, drastically reducing the latency caused by copying data between system RAM and the GPU's VRAM.
+- **True Performance Gains:** This isn't just running the model on the GPU; it's an optimized pipeline designed to minimize latency and maximize throughput, making real-time generation significantly faster than on CPU.
 
 This enhancement transforms KittenTTS from a lightweight-but-modest engine into a high-speed synthesis powerhouse.
 
@@ -60,6 +62,7 @@ This enhancement transforms KittenTTS from a lightweight-but-modest engine into 
 The [KittenTTS model](https://github.com/KittenML/KittenTTS) serves as an excellent alternative to [Piper TTS](https://github.com/rhasspy/piper) for fast generation on limited compute and edge devices like Raspberry Pi 5.
 
 **KittenTTS Model Advantages:**
+
 - **Extreme Efficiency**: Just 15 million parameters and under 25MB, significantly smaller than most Piper models
 - **Universal Compatibility**: CPU-optimized to run without GPU on any device and "works literally everywhere"
 - **Real-time Performance**: Optimized for real-time speech synthesis even on resource-constrained hardware
@@ -71,51 +74,52 @@ Perfect for users seeking Piper's offline capabilities with better performance o
 
 ## ✨ Key Features of This Server
 
-*   **🚀 Ultra-Lightweight Model:** Powered by the `KittenTTS` ONNX model, which is under 25MB.
-*   ⚡ **True GPU Acceleration:** Full support for **NVIDIA (CUDA)** via an optimized `onnxruntime-gpu` pipeline with I/O Binding for maximum performance.
-*   **📚 Large Text & Audiobook Generation:**
-    *   Automatically handles long texts by intelligently splitting them based on sentence boundaries.
-    *   Processes each chunk individually and seamlessly concatenates the resulting audio.
-    *   **Ideal for audiobooks** - paste entire books and get professional-quality audio.
-*   **🖥️ Modern Web Interface:**
-    *   Intuitive UI for text input, voice selection, and parameter adjustment.
-    *   Real-time waveform visualization of generated audio.
-*   **🎤 8 Built-in Voices:**
-    *   Utilizes the 8 built-in voices from the KittenTTS model (4 male, 4 female).
-    *   Easily selectable via a UI dropdown menu.
-*   **⚙️ Dual API Endpoints:**
-    *   A primary `/tts` endpoint offering full control over all generation parameters.
-    *   An OpenAI-compatible `/v1/audio/speech` endpoint for seamless integration into existing workflows.
-*   **🔧 Easy Configuration:**
-    *   All settings are managed through a single `config.yaml` file.
-    *   The server automatically creates a default config on the first run.
-*   **💾 UI State Persistence:** The web interface remembers your last-used text, voice, and settings to streamline your workflow.
-*   **🐳 Docker Support:** Easy, reproducible deployment for both CPU and GPU via Docker Compose.
+- **🚀 Ultra-Lightweight Model:** Powered by the `KittenTTS` ONNX model, which is under 25MB.
+- ⚡ **True GPU Acceleration:** Full support for **NVIDIA (CUDA)** via an optimized `onnxruntime-gpu` pipeline with I/O Binding for maximum performance.
+- **📚 Large Text & Audiobook Generation:**
+  - Automatically handles long texts by intelligently splitting them based on sentence boundaries.
+  - Processes each chunk individually and seamlessly concatenates the resulting audio.
+  - **Ideal for audiobooks** - paste entire books and get professional-quality audio.
+- **🖥️ Modern Web Interface:**
+  - Intuitive UI for text input, voice selection, and parameter adjustment.
+  - Real-time waveform visualization of generated audio.
+- **🎤 8 Built-in Voices:**
+  - Utilizes the 8 built-in voices from the KittenTTS model (4 male, 4 female).
+  - Easily selectable via a UI dropdown menu.
+- **⚙️ Dual API Endpoints:**
+  - A primary `/tts` endpoint offering full control over all generation parameters.
+  - An OpenAI-compatible `/v1/audio/speech` endpoint for seamless integration into existing workflows.
+- **🔧 Easy Configuration:**
+  - All settings are managed through a single `config.yaml` file.
+  - The server automatically creates a default config on the first run.
+- **💾 UI State Persistence:** The web interface remembers your last-used text, voice, and settings to streamline your workflow.
+- **🐳 Docker Support:** Easy, reproducible deployment for both CPU and GPU via Docker Compose.
 
 ---
 
 ## 🔩 System Prerequisites
 
-*   **Operating System:** Windows 10/11 (64-bit) or Linux (Debian/Ubuntu recommended).
-*   **Python:** Version 3.10 or later.
-*   **Git:** For cloning the repository.
-*   **eSpeak NG:** This is a **required** dependency for text phonemization.
-    *   **Windows:** See installation guide below.
-    *   **Linux:** `sudo apt install espeak-ng`
-*   **Raspberry Pi:**
-    *   Raspberry Pi 5
-    *   Raspberry Pi 4      
-*   **(For GPU Acceleration):**
-    *   An **NVIDIA GPU** with CUDA support.
-*   **(For Linux Only):**
-    *   `libsndfile1`: Audio library needed by `soundfile`. Install via `sudo apt install libsndfile1`.
-    *   `ffmpeg`: For robust audio operations. Install via `sudo apt install ffmpeg`.
+- **Operating System:** Windows 10/11 (64-bit) or Linux (Debian/Ubuntu recommended).
+- **Python:** Version 3.10 or later.
+- **Git:** For cloning the repository.
+- **eSpeak NG:** This is a **required** dependency for text phonemization.
+  - **Windows:** See installation guide below.
+  - **Linux:** `sudo apt install espeak-ng`
+- **Raspberry Pi:**
+  - Raspberry Pi 5
+  - Raspberry Pi 4
+- **(For GPU Acceleration):**
+  - An **NVIDIA GPU** with CUDA support.
+- **(For Linux Only):**
+  - `libsndfile1`: Audio library needed by `soundfile`. Install via `sudo apt install libsndfile1`.
+  - `ffmpeg`: For robust audio operations. Install via `sudo apt install ffmpeg`.
 
 ## 💻 Installation and Setup
 
 This project uses specific dependency files and a clear process to ensure a smooth, one-command installation for your hardware.
 
 **1. Clone the Repository**
+
 ```bash
 git clone https://github.com/devnen/Kitten-TTS-Server.git
 cd Kitten-TTS-Server
@@ -124,32 +128,34 @@ cd Kitten-TTS-Server
 **2. Create and Activate a Python Virtual Environment**
 This is crucial to avoid conflicts with other Python projects.
 
-*   **Windows (PowerShell):**
-    ```powershell
-    python -m venv venv
-    .\venv\Scripts\activate
-    ```
-    If you see an error about execution policies, run:
-    `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` and try activating again.
+- **Windows (PowerShell):**
 
-*   **Linux (Bash):**
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
-    Your command prompt should now start with `(venv)`.
+  ```powershell
+  python -m venv venv
+  .\venv\Scripts\activate
+  ```
+
+  If you see an error about execution policies, run:
+  `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` and try activating again.
+
+- **Linux (Bash):**
+  ```bash
+  python3 -m venv venv
+  source venv/bin/activate
+  ```
+  Your command prompt should now start with `(venv)`.
 
 **3. Install eSpeak NG (Required)**
 
-*   **Windows:**
-    1.  Download the installer from the [eSpeak NG Releases page](https://github.com/espeak-ng/espeak-ng/releases/latest). Look for the file named `espeak-ng-X.XX-x64.msi`.
-    2.  Run the installer with default settings.
-    3.  **Important:** Restart your terminal (PowerShell/CMD) after installation for the changes to take effect.
+- **Windows:**
+  1.  Download the installer from the [eSpeak NG Releases page](https://github.com/espeak-ng/espeak-ng/releases/latest). Look for the file named `espeak-ng-X.XX-x64.msi`.
+  2.  Run the installer with default settings.
+  3.  **Important:** Restart your terminal (PowerShell/CMD) after installation for the changes to take effect.
 
-*   **Linux (Ubuntu/Debian):**
-    ```bash
-    sudo apt update && sudo apt install -y espeak-ng
-    ```
+- **Linux (Ubuntu/Debian):**
+  ```bash
+  sudo apt update && sudo apt install -y espeak-ng
+  ```
 
 **4. Install Python Dependencies**
 
@@ -158,6 +164,7 @@ Choose one of the following paths based on your hardware.
 ---
 
 ### **Option 1: CPU-Only Installation**
+
 This is the simplest path and works on any machine.
 
 ```bash
@@ -169,6 +176,7 @@ pip install -r requirements.txt
 ---
 
 ### **Option 2: NVIDIA GPU Installation (Recommended for Performance)**
+
 This method ensures all necessary CUDA libraries are correctly installed within your virtual environment for a hassle-free setup.
 
 ```bash
@@ -187,9 +195,11 @@ pip install -r requirements-nvidia.txt
 ```
 
 **After installation, verify that PyTorch can see your GPU:**
+
 ```bash
 python -c "import torch; print(f'PyTorch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'Device name: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else None}')"
 ```
+
 If `CUDA available:` shows `True`, your setup is correct!
 
 ---
@@ -221,15 +231,18 @@ pip install -r requirements-nvidia.txt
 **After upgrading, do the following:**
 
 1.  **Verify the installation** by running the same check from Option 2:
+
     ```bash
     python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
     ```
+
     The output must be `CUDA available: True`.
 
 2.  **Update your configuration** by editing the `config.yaml` file:
+
     ```yaml
     tts_engine:
-      device: auto  # Or "cuda", or "gpu"
+      device: auto # Or "cuda", or "gpu"
     ```
 
 3.  **Restart the server** for the changes to take effect. It will now use your NVIDIA GPU.
@@ -242,17 +255,18 @@ pip install -r requirements-nvidia.txt
 The first time you start the server, it will automatically download the KittenTTS model (~25MB) from Hugging Face. This is a one-time process. Subsequent launches will be instant.
 
 1.  **Activate the virtual environment** (if not already active).
-    *   Windows: `.\venv\Scripts\activate`
-    *   Linux: `source venv/bin/activate`
+    - Windows: `.\venv\Scripts\activate`
+    - Linux: `source venv/bin/activate`
 
 2.  **Run the server:**
+
     ```bash
     python server.py
     ```
 
 3.  The server will start and automatically open the Web UI in your default browser.
-    *   **Web UI:** `http://localhost:8005`
-    *   **API Docs:** `http://localhost:8005/docs`
+    - **Web UI:** `http://localhost:8005`
+    - **API Docs:** `http://localhost:8005/docs`
 
 4.  **To stop the server:** Press `CTRL+C` in the terminal.
 
@@ -265,6 +279,7 @@ KittenTTS runs excellently on Raspberry Pi devices, making it ideal for local ne
 **Raspberry Pi 5 works out-of-the-box** with the standard Linux installation guide above. No special steps required!
 
 **Tested Configuration:**
+
 - **Hardware:** Raspberry Pi 5 Model B Rev 1.0
 - **OS:** Debian GNU/Linux 12 (bookworm) 64-bit
 - **Architecture:** aarch64 (ARM64)
@@ -273,6 +288,7 @@ KittenTTS runs excellently on Raspberry Pi devices, making it ideal for local ne
 - **Installation:** Follow the standard [Linux Installation](#linux-installation) guide exactly
 
 **Installation Steps:**
+
 ```bash
 # Step 1: Install system dependencies
 sudo apt update && sudo apt upgrade -y
@@ -296,13 +312,15 @@ python server.py
 **Raspberry Pi 4 support is currently in development** due to complex dependency compilation issues on 32-bit ARM architecture.
 
 **Known Technical Challenges:**
+
 - **ONNX Runtime:** No official ARM wheels available on PyPI
 - **PyTorch Ecosystem:** Limited pre-built wheel availability for armv7l
 - **NLP Dependencies:** SpaCy and related libraries fail to compile due to architecture detection issues
 - **Audio Processing:** Some native audio libraries require manual compilation
 
 **Current Status:**
-- ✅ **64-bit Raspberry Pi OS:** May work with standard installation (limited testing)  
+
+- ✅ **64-bit Raspberry Pi OS:** May work with standard installation (limited testing)
 - ⚠️ **32-bit Raspberry Pi OS:** Requires complex manual dependency resolution
 - 🔧 **Alternative Solutions:** Being developed for core functionality
 
@@ -318,18 +336,19 @@ Run Kitten-TTS-Server easily using Docker. The recommended method uses Docker Co
 
 ### Prerequisites
 
-*   [Docker](https://docs.docker.com/get-docker/) installed.
-*   [Docker Compose](https://docs.docker.com/compose/install/) installed (usually included with Docker Desktop).
-*   **(For GPU acceleration)**
-    *   An NVIDIA GPU.
-    *   Up-to-date NVIDIA drivers for your host operating system.
-    *   The [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) installed.
+- [Docker](https://docs.docker.com/get-docker/) installed.
+- [Docker Compose](https://docs.docker.com/compose/install/) installed (usually included with Docker Desktop).
+- **(For GPU acceleration)**
+  - An NVIDIA GPU.
+  - Up-to-date NVIDIA drivers for your host operating system.
+  - The [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) installed.
 
 ### Using Docker Compose (Recommended)
 
 This method uses the provided `docker-compose.yml` files to automatically build the correct image and manage the container, volumes, and configuration.
 
 **1. Clone the Repository**
+
 ```bash
 git clone https://github.com/devnen/Kitten-TTS-Server.git
 cd Kitten-TTS-Server
@@ -340,6 +359,7 @@ cd Kitten-TTS-Server
 Choose one of the following commands:
 
 #### **For NVIDIA GPU (Recommended for Performance):**
+
 The default `docker-compose.yml` is configured for NVIDIA GPUs. It will build the image with full CUDA support.
 
 ```bash
@@ -347,6 +367,7 @@ docker compose up -d --build
 ```
 
 #### **For CPU-only:**
+
 This uses a dedicated compose file that builds the image without GPU dependencies.
 
 ```bash
@@ -357,29 +378,30 @@ docker compose -f docker-compose-cpu.yml up -d --build
 
 ### 3. Access and Manage the Application
 
-*   **Access the Web UI:** Open your browser to `http://localhost:8005`
-*   **Access the API Docs:** `http://localhost:8005/docs`
+- **Access the Web UI:** Open your browser to `http://localhost:8005`
+- **Access the API Docs:** `http://localhost:8005/docs`
 
-*   **View Logs:**
-    ```bash
-    # For GPU or CPU version
-    docker compose logs -f
-    ```
+- **View Logs:**
 
-*   **Stop the Container:**
-    ```bash
-    # This stops and removes the container but keeps your data volumes
-    docker compose down
-    ```
+  ```bash
+  # For GPU or CPU version
+  docker compose logs -f
+  ```
+
+- **Stop the Container:**
+  ```bash
+  # This stops and removes the container but keeps your data volumes
+  docker compose down
+  ```
 
 ### How It Works
 
-*   **Build-time Argument:** The `Dockerfile` uses a `RUNTIME` argument (`nvidia` or `cpu`) to conditionally install the correct Python packages, creating an optimized image for your hardware.
-*   **Persistent Data:** The `docker-compose` files use Docker volumes to persist your important data on your host machine, even if the container is removed:
-    *   `./config.yaml`: Your main server configuration file.
-    *   `./outputs`: All generated audio files are saved here.
-    *   `./logs`: Server log files for troubleshooting.
-    *   `hf_cache` (Named Volume): Persists the downloaded Hugging Face models, saving significant time on rebuilds.
+- **Build-time Argument:** The `Dockerfile` uses a `RUNTIME` argument (`nvidia` or `cpu`) to conditionally install the correct Python packages, creating an optimized image for your hardware.
+- **Persistent Data:** The `docker-compose` files use Docker volumes to persist your important data on your host machine, even if the container is removed:
+  - `./config.yaml`: Your main server configuration file.
+  - `./outputs`: All generated audio files are saved here.
+  - `./logs`: Server log files for troubleshooting.
+  - `hf_cache` (Named Volume): Persists the downloaded Hugging Face models, saving significant time on rebuilds.
 
 ### Verify GPU Access (for NVIDIA users)
 
@@ -392,6 +414,7 @@ docker compose exec kitten-tts-server nvidia-smi
 # Check if PyTorch inside the container can access CUDA
 docker compose exec kitten-tts-server python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
 ```
+
 If `CUDA available:` prints `True`, your GPU setup is working correctly
 
 ## 💡 Usage Guide
@@ -422,63 +445,64 @@ The server exposes two main endpoints for TTS. See `http://localhost:8005/docs` 
 
 This endpoint offers the most control.
 
-*   **Method:** `POST`
-*   **Body:**
-    ```json
-    {
-      "text": "Hello from the KittenTTS API!",
-      "voice": "Leo",
-      "speed": 1.0,
-      "output_format": "mp3",
-      "split_text": true,
-      "chunk_size": 300
-    }
-    ```
-*   **Response:** Streaming audio file (`audio/wav`, `audio/mp3`, etc.).
+- **Method:** `POST`
+- **Body:**
+  ```json
+  {
+    "text": "Hello from the KittenTTS API!",
+    "voice": "Leo",
+    "speed": 1.0,
+    "output_format": "mp3",
+    "split_text": true,
+    "chunk_size": 300
+  }
+  ```
+- **Response:** Streaming audio file (`audio/wav`, `audio/mp3`, etc.).
 
 ### OpenAI-Compatible Endpoint: `/v1/audio/speech`
 
 Use this for drop-in compatibility with scripts expecting OpenAI's TTS API structure.
 
-*   **Method:** `POST`
-*   **Body:**
-    ```json
-    {
-      "model": "kitten-tts",
-      "input": "This is an OpenAI-compatible request.",
-      "voice": "Luna",
-      "response_format": "wav",
-      "speed": 0.9
-    }
-    ```
+- **Method:** `POST`
+- **Body:**
+  ```json
+  {
+    "model": "kitten-tts",
+    "input": "This is an OpenAI-compatible request.",
+    "voice": "Luna",
+    "response_format": "wav",
+    "speed": 0.9
+  }
+  ```
 
 ## ⚙️ Configuration
 
 All server settings are managed in the `config.yaml` file. It's created automatically on first launch if it doesn't exist.
 
 **Key Settings:**
-*   `server.host`, `server.port`: Network settings.
-*   `tts_engine.device`: Set to `auto`, `cuda`, or `cpu`. The server will use your GPU if set to `auto` or `cuda` and a compatible environment is found.
-*   `generation_defaults.speed`: Default speech speed (1.0 is normal).
-*   `audio_output.format`: Default audio format (`wav`, `mp3`, `opus`).
+
+- `server.host`, `server.port`: Network settings.
+- `tts_engine.device`: Set to `auto`, `cuda`, or `cpu`. The server will use your GPU if set to `auto` or `cuda` and a compatible environment is found.
+- `generation_defaults.speed`: Default speech speed (1.0 is normal).
+- `audio_output.format`: Default audio format (`wav`, `mp3`, `opus`).
 
 ## 🛠️ Troubleshooting
 
-*   **Phonemizer / eSpeak Errors:**
-    *   This is the most common issue. Ensure you have installed **eSpeak NG** correctly for your OS and **restarted your terminal** afterward. The server includes auto-detection logic for common install paths.
-*   **GPU Not Used / Falls Back to CPU:**
-    *   Follow the **NVIDIA GPU Installation** steps exactly. The most common cause is `torch` being installed without CUDA support.
-    *   Run the verification command from the installation guide to confirm `torch.cuda.is_available()` is `True`.
-*   **"No module named 'soundfile'" or Audio Errors on Linux:**
-    *   The underlying system library is likely missing. Run `sudo apt install libsndfile1`.
-*   **"Port already in use" Error:**
-    *   Another application is using port 8005. Stop that application or change the port in `config.yaml` (e.g., `port: 8006`) and restart the server.
+- **Phonemizer / eSpeak Errors:**
+  - This is the most common issue. Ensure you have installed **eSpeak NG** correctly for your OS and **restarted your terminal** afterward. The server includes auto-detection logic for common install paths.
+- **GPU Not Used / Falls Back to CPU:**
+  - Follow the **NVIDIA GPU Installation** steps exactly. The most common cause is `torch` being installed without CUDA support.
+  - Run the verification command from the installation guide to confirm `torch.cuda.is_available()` is `True`.
+- **"No module named 'soundfile'" or Audio Errors on Linux:**
+  - The underlying system library is likely missing. Run `sudo apt install libsndfile1`.
+- **"Port already in use" Error:**
+  - Another application is using port 8005. Stop that application or change the port in `config.yaml` (e.g., `port: 8006`) and restart the server.
 
 ## 🙏 Acknowledgements & Credits
 
-*   **Core Model:** This project is powered by the **[KittenTTS model](https://github.com/KittenML/KittenTTS)** created by **[KittenML](https://github.com/KittenML)**. Our work adds a high-performance server and UI layer on top of their excellent lightweight model.
-*   **Core Libraries:** FastAPI, Uvicorn, ONNX Runtime, PyTorch, Hugging Face Hub, Phonemizer.
-*   **UI Inspiration:** The UI/server architecture is inspired by our previous work on the [Chatterbox-TTS-Server](https://github.com/devnen/Chatterbox-TTS-Server).
+- **Core Model:** This project is powered by the **[KittenTTS model](https://github.com/KittenML/KittenTTS)** created by **[KittenML](https://github.com/KittenML)**. Our work adds a high-performance server and UI layer on top of their excellent lightweight model.
+- **Core Libraries:** FastAPI, Uvicorn, ONNX Runtime, PyTorch, Hugging Face Hub, Phonemizer.
+- **UI Inspiration:** The UI/server architecture is inspired by our previous work on the [Chatterbox-TTS-Server](https://github.com/devnen/Chatterbox-TTS-Server).
 
 ## 📄 License
 
@@ -487,6 +511,3 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome! Please feel free to open an issue or submit a pull request.
-
-
-
