@@ -5,7 +5,7 @@ ARG RUNTIME=nvidia
 # Select base image based on RUNTIME:
 # - nvidia: full CUDA runtime (~1.5GB), required for GPU inference
 # - cpu:    plain Ubuntu 24.04 (~80MB), sufficient for CPU-only inference
-FROM nvidia/cuda:12.1.1-runtime-ubuntu24.04 AS base-nvidia
+FROM nvidia/cuda:12.6.0-runtime-ubuntu24.04 AS base-nvidia
 FROM ubuntu:24.04 AS base-cpu
 FROM base-${RUNTIME} AS final
 
@@ -49,7 +49,7 @@ RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 RUN if [ "$RUNTIME" = "nvidia" ]; then \
     echo "RUNTIME=nvidia, installing GPU dependencies..."; \
     pip3 install --no-cache-dir --break-system-packages onnxruntime-gpu; \
-    pip3 install --no-cache-dir --break-system-packages torch torchaudio --index-url https://download.pytorch.org/whl/cu121; \
+    pip3 install --no-cache-dir --break-system-packages torch torchaudio --index-url https://download.pytorch.org/whl/cu126; \
     pip3 install --no-cache-dir --break-system-packages -r requirements-nvidia.txt; \
     else \
     echo "RUNTIME=cpu, skipping GPU dependencies."; \
