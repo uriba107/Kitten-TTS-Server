@@ -156,7 +156,7 @@ async def lifespan(app: FastAPI):
             )
             browser_thread.start()
 
-        max_queue = config_manager.get_int("server.max_queue_depth", 10)
+        max_queue = max(1, config_manager.get_int("server.max_queue_depth", 10))
         app.state.tts_semaphore = asyncio.Semaphore(1)
         app.state.tts_max_queue = max_queue
         app.state.tts_queue_depth = 0
