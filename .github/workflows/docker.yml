@@ -5,7 +5,10 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -49,7 +52,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ghcr.io/${{ steps.vars.outputs.REPO }}:cuda${{ steps.vars.outputs.SUFFIX }}
             ${{ steps.vars.outputs.IS_TAG == 'true' && format('ghcr.io/{0}:cuda-latest', steps.vars.outputs.REPO) || '' }}
@@ -61,7 +64,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ghcr.io/${{ steps.vars.outputs.REPO }}:cpu${{ steps.vars.outputs.SUFFIX }}
             ${{ steps.vars.outputs.IS_TAG == 'true' && format('ghcr.io/{0}:cpu-latest', steps.vars.outputs.REPO) || '' }}

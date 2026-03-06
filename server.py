@@ -17,6 +17,8 @@ from contextlib import asynccontextmanager
 from typing import Optional, List, Dict, Any, Literal
 import webbrowser  # For automatic browser opening
 import threading  # For automatic browser opening
+import asyncio
+import functools
 
 from fastapi import (
     FastAPI,
@@ -153,6 +155,13 @@ async def lifespan(app: FastAPI):
                 daemon=True,
             )
             browser_thread.start()
+
+        max_queue = max(1, config_manager.get_int("server.max_queue_depth", 10))
+        app.state.tts_semaphore = asyncio.Semaphore(1)
+        app.state.tts_max_queue = max_queue
+        app.state.tts_queue_depth = 0
+        app.state.tts_queue_lock = asyncio.Lock()
+        logger.info(f"TTS request queue initialized: max_queue_depth={max_queue}")
 
         logger.info("Application startup sequence complete.")
         startup_complete_event.set()
@@ -410,7 +419,7 @@ async def restart_server_endpoint():
     },
 )
 async def custom_tts_endpoint(
-    request: CustomTTSRequest, background_tasks: BackgroundTasks
+    request: CustomTTSRequest, background_tasks: BackgroundTasks, http_request: Request
 ):
     """
     Generates speech audio from text using specified parameters.
@@ -462,43 +471,65 @@ async def custom_tts_endpoint(
             status_code=400, detail="Text processing resulted in no usable chunks."
         )
 
-    for i, chunk in enumerate(text_chunks):
-        logger.info(f"Synthesizing chunk {i+1}/{len(text_chunks)}...")
-        try:
-            chunk_audio_np, chunk_sr_from_engine = engine.synthesize(
-                text=chunk,
-                voice=request.voice,
-                speed=(
-                    request.speed
-                    if request.speed is not None
-                    else get_gen_default_speed()
-                ),
+    async with http_request.app.state.tts_queue_lock:
+        if http_request.app.state.tts_queue_depth >= http_request.app.state.tts_max_queue:
+            logger.warning(
+                f"TTS queue full ({http_request.app.state.tts_max_queue} requests waiting). Rejecting request."
             )
-            perf_monitor.record(f"Engine synthesized chunk {i+1}")
+            raise HTTPException(
+                status_code=503,
+                detail=f"TTS queue is full ({http_request.app.state.tts_max_queue} requests waiting). Try again later.",
+            )
+        http_request.app.state.tts_queue_depth += 1
+        logger.debug(f"TTS queue depth: {http_request.app.state.tts_queue_depth}/{http_request.app.state.tts_max_queue}")
 
-            if chunk_audio_np is None or chunk_sr_from_engine is None:
-                error_detail = f"TTS engine failed to synthesize audio for chunk {i+1}."
-                logger.error(error_detail)
-                raise HTTPException(status_code=500, detail=error_detail)
+    try:
+        async with http_request.app.state.tts_semaphore:
+            for i, chunk in enumerate(text_chunks):
+                logger.info(f"Synthesizing chunk {i+1}/{len(text_chunks)}...")
+                try:
+                    loop = asyncio.get_event_loop()
+                    chunk_audio_np, chunk_sr_from_engine = await loop.run_in_executor(
+                        None,
+                        functools.partial(
+                            engine.synthesize,
+                            text=chunk,
+                            voice=request.voice,
+                            speed=(
+                                request.speed
+                                if request.speed is not None
+                                else get_gen_default_speed()
+                            ),
+                        ),
+                    )
+                    perf_monitor.record(f"Engine synthesized chunk {i+1}")
 
-            if engine_output_sample_rate is None:
-                engine_output_sample_rate = chunk_sr_from_engine
-            elif engine_output_sample_rate != chunk_sr_from_engine:
-                logger.warning(
-                    f"Inconsistent sample rate from engine: chunk {i+1} ({chunk_sr_from_engine}Hz) "
-                    f"differs from previous ({engine_output_sample_rate}Hz). Using first chunk's SR."
-                )
+                    if chunk_audio_np is None or chunk_sr_from_engine is None:
+                        error_detail = f"TTS engine failed to synthesize audio for chunk {i+1}."
+                        logger.error(error_detail)
+                        raise HTTPException(status_code=500, detail=error_detail)
 
-            # The speed factor is now handled by the engine directly, so no post-processing for speed is needed here.
+                    if engine_output_sample_rate is None:
+                        engine_output_sample_rate = chunk_sr_from_engine
+                    elif engine_output_sample_rate != chunk_sr_from_engine:
+                        logger.warning(
+                            f"Inconsistent sample rate from engine: chunk {i+1} ({chunk_sr_from_engine}Hz) "
+                            f"differs from previous ({engine_output_sample_rate}Hz). Using first chunk's SR."
+                        )
 
-            all_audio_segments_np.append(chunk_audio_np)
+                    # The speed factor is now handled by the engine directly, so no post-processing for speed is needed here.
 
-        except HTTPException as http_exc:
-            raise http_exc
-        except Exception as e_chunk:
-            error_detail = f"Error processing audio chunk {i+1}: {str(e_chunk)}"
-            logger.error(error_detail, exc_info=True)
-            raise HTTPException(status_code=500, detail=error_detail)
+                    all_audio_segments_np.append(chunk_audio_np)
+
+                except HTTPException as http_exc:
+                    raise http_exc
+                except Exception as e_chunk:
+                    error_detail = f"Error processing audio chunk {i+1}: {str(e_chunk)}"
+                    logger.error(error_detail, exc_info=True)
+                    raise HTTPException(status_code=500, detail=error_detail)
+    finally:
+        http_request.app.state.tts_queue_depth -= 1
+        logger.debug(f"TTS queue depth after release: {http_request.app.state.tts_queue_depth}/{http_request.app.state.tts_max_queue}")
 
     if not all_audio_segments_np:
         logger.error("No audio segments were successfully generated.")
@@ -608,7 +639,7 @@ async def custom_tts_endpoint(
 
 
 @app.post("/v1/audio/speech", tags=["OpenAI Compatible"])
-async def openai_speech_endpoint(request: OpenAISpeechRequest):
+async def openai_speech_endpoint(request: OpenAISpeechRequest, http_request: Request):
     # Check if the TTS model is loaded
     if not engine.MODEL_LOADED:
         raise HTTPException(
@@ -617,12 +648,31 @@ async def openai_speech_endpoint(request: OpenAISpeechRequest):
         )
 
     try:
-        # Synthesize the audio
-        audio_np, sr = engine.synthesize(
-            text=request.input_,
-            voice=request.voice,
-            speed=request.speed,
-        )
+        async with http_request.app.state.tts_queue_lock:
+            if http_request.app.state.tts_queue_depth >= http_request.app.state.tts_max_queue:
+                logger.warning(
+                    f"TTS queue full ({http_request.app.state.tts_max_queue} requests waiting). Rejecting request."
+                )
+                raise HTTPException(
+                    status_code=503,
+                    detail=f"TTS queue is full ({http_request.app.state.tts_max_queue} requests waiting). Try again later.",
+                )
+            http_request.app.state.tts_queue_depth += 1
+
+        try:
+            async with http_request.app.state.tts_semaphore:
+                loop = asyncio.get_event_loop()
+                audio_np, sr = await loop.run_in_executor(
+                    None,
+                    functools.partial(
+                        engine.synthesize,
+                        text=request.input_,
+                        voice=request.voice,
+                        speed=request.speed,
+                    ),
+                )
+        finally:
+            http_request.app.state.tts_queue_depth -= 1
 
         if audio_np is None or sr is None:
             raise HTTPException(

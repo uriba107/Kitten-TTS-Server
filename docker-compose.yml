@@ -1,6 +1,6 @@
 services:
   kitten-tts-server:
-    image: ghcr.io/uriba107/kitten-tts-server:cpu
+    image: ghcr.io/uriba107/kitten-tts-server:cpu-latest
     ports:
       - "${PORT:-8005}:8005"
     volumes:
@@ -16,6 +16,10 @@ services:
     environment:
       # Enable faster Hugging Face downloads inside the container
       - HF_HUB_ENABLE_HF_TRANSFER=1
+      # TTS queue settings (override config.yaml without mounting a custom file)
+      # - KITTEN_MAX_QUEUE_DEPTH=10  # Max queued TTS requests before returning 503
+      # - KITTEN_HOST=0.0.0.0
+      # - KITTEN_PORT=8005
 
 # Define the named volume for the Hugging Face cache
 volumes:
