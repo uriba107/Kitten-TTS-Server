@@ -8,6 +8,7 @@ ARG RUNTIME=nvidia
 FROM nvidia/cuda:12.6.0-runtime-ubuntu24.04 AS base-nvidia
 FROM ubuntu:24.04 AS base-cpu
 FROM base-${RUNTIME} AS final
+ARG RUNTIME
 
 # Set environment variables for Python and Hugging Face
 ENV PYTHONDONTWRITEBYTECODE=1
