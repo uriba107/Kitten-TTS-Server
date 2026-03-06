@@ -419,7 +419,7 @@ async def restart_server_endpoint():
     },
 )
 async def custom_tts_endpoint(
-    request: CustomTTSRequest, background_tasks: BackgroundTasks
+    request: CustomTTSRequest, background_tasks: BackgroundTasks, http_request: Request
 ):
     """
     Generates speech audio from text using specified parameters.
@@ -471,20 +471,20 @@ async def custom_tts_endpoint(
             status_code=400, detail="Text processing resulted in no usable chunks."
         )
 
-    async with request.app.state.tts_queue_lock:
-        if request.app.state.tts_queue_depth >= request.app.state.tts_max_queue:
+    async with http_request.app.state.tts_queue_lock:
+        if http_request.app.state.tts_queue_depth >= http_request.app.state.tts_max_queue:
             logger.warning(
-                f"TTS queue full ({request.app.state.tts_max_queue} requests waiting). Rejecting request."
+                f"TTS queue full ({http_request.app.state.tts_max_queue} requests waiting). Rejecting request."
             )
             raise HTTPException(
                 status_code=503,
-                detail=f"TTS queue is full ({request.app.state.tts_max_queue} requests waiting). Try again later.",
+                detail=f"TTS queue is full ({http_request.app.state.tts_max_queue} requests waiting). Try again later.",
             )
-        request.app.state.tts_queue_depth += 1
-        logger.debug(f"TTS queue depth: {request.app.state.tts_queue_depth}/{request.app.state.tts_max_queue}")
+        http_request.app.state.tts_queue_depth += 1
+        logger.debug(f"TTS queue depth: {http_request.app.state.tts_queue_depth}/{http_request.app.state.tts_max_queue}")
 
     try:
-        async with request.app.state.tts_semaphore:
+        async with http_request.app.state.tts_semaphore:
             for i, chunk in enumerate(text_chunks):
                 logger.info(f"Synthesizing chunk {i+1}/{len(text_chunks)}...")
                 try:
@@ -528,8 +528,8 @@ async def custom_tts_endpoint(
                     logger.error(error_detail, exc_info=True)
                     raise HTTPException(status_code=500, detail=error_detail)
     finally:
-        request.app.state.tts_queue_depth -= 1
-        logger.debug(f"TTS queue depth after release: {request.app.state.tts_queue_depth}/{request.app.state.tts_max_queue}")
+        http_request.app.state.tts_queue_depth -= 1
+        logger.debug(f"TTS queue depth after release: {http_request.app.state.tts_queue_depth}/{http_request.app.state.tts_max_queue}")
 
     if not all_audio_segments_np:
         logger.error("No audio segments were successfully generated.")
@@ -639,7 +639,7 @@ async def custom_tts_endpoint(
 
 
 @app.post("/v1/audio/speech", tags=["OpenAI Compatible"])
-async def openai_speech_endpoint(request: OpenAISpeechRequest):
+async def openai_speech_endpoint(request: OpenAISpeechRequest, http_request: Request):
     # Check if the TTS model is loaded
     if not engine.MODEL_LOADED:
         raise HTTPException(
@@ -648,19 +648,19 @@ async def openai_speech_endpoint(request: OpenAISpeechRequest):
         )
 
     try:
-        async with request.app.state.tts_queue_lock:
-            if request.app.state.tts_queue_depth >= request.app.state.tts_max_queue:
+        async with http_request.app.state.tts_queue_lock:
+            if http_request.app.state.tts_queue_depth >= http_request.app.state.tts_max_queue:
                 logger.warning(
-                    f"TTS queue full ({request.app.state.tts_max_queue} requests waiting). Rejecting request."
+                    f"TTS queue full ({http_request.app.state.tts_max_queue} requests waiting). Rejecting request."
                 )
                 raise HTTPException(
                     status_code=503,
-                    detail=f"TTS queue is full ({request.app.state.tts_max_queue} requests waiting). Try again later.",
+                    detail=f"TTS queue is full ({http_request.app.state.tts_max_queue} requests waiting). Try again later.",
                 )
-            request.app.state.tts_queue_depth += 1
+            http_request.app.state.tts_queue_depth += 1
 
         try:
-            async with request.app.state.tts_semaphore:
+            async with http_request.app.state.tts_semaphore:
                 loop = asyncio.get_event_loop()
                 audio_np, sr = await loop.run_in_executor(
                     None,
@@ -672,7 +672,7 @@ async def openai_speech_endpoint(request: OpenAISpeechRequest):
                     ),
                 )
         finally:
-            request.app.state.tts_queue_depth -= 1
+            http_request.app.state.tts_queue_depth -= 1
 
         if audio_np is None or sr is None:
             raise HTTPException(
