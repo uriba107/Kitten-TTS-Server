@@ -1,6 +1,6 @@
 services:
   kitten-tts-server:
-    image: ghcr.io/uriba107/kitten-tts-server:cpu-latest
+    image: ghcr.io/uriba107/kitten-tts-server:cpu
     ports:
       - "${PORT:-8005}:8005"
     volumes:
@@ -24,3 +24,4 @@ services:
 # Define the named volume for the Hugging Face cache
 volumes:
   hf_cache:
+
