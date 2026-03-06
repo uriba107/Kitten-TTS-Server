@@ -15,6 +15,15 @@ from pathlib import Path
 # Standard logger setup
 logger = logging.getLogger(__name__)
 
+# --- Environment Variable Overrides ---
+# These env vars take precedence over config.yaml values.
+# Useful for Docker / docker-compose deployments without mounting a custom config file.
+_ENV_VAR_OVERRIDES: Dict[str, str] = {
+    "server.host": "KITTEN_HOST",
+    "server.port": "KITTEN_PORT",
+    "server.max_queue_depth": "KITTEN_MAX_QUEUE_DEPTH",
+}
+
 # --- File Path Constants ---
 # Defines the primary configuration file name.
 CONFIG_FILE_PATH = Path("config.yaml")
@@ -43,6 +52,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         ),  # Path to the server log file.
         "log_file_max_size_mb": 10,  # Maximum size of a single log file before rotation.
         "log_file_backup_count": 5,  # Number of backup log files to keep.
+        "max_queue_depth": 10,  # Max TTS requests that can queue; beyond this a 503 is returned.
     },
     "model": {  # Updated section for model source configuration
         "repo_id": "KittenML/kitten-tts-micro-0.8",  # KittenTTS Hugging Face repository ID
@@ -423,10 +433,17 @@ class YamlConfigManager:
     def get(self, key_path: str, default: Any = None) -> Any:
         """
         Retrieves a configuration value using a dot-separated key path (e.g., 'server.port').
+        Environment variables defined in _ENV_VAR_OVERRIDES take precedence over config.yaml.
         If the key path is not found, 'default' is returned.
         For mutable types (dicts, lists), a deep copy is returned to prevent
         unintended modification of the in-memory configuration.
         """
+        env_var_name = _ENV_VAR_OVERRIDES.get(key_path)
+        if env_var_name:
+            env_val = os.environ.get(env_var_name)
+            if env_val is not None:
+                logger.debug(f"Config '{key_path}' overridden by env var {env_var_name}='{env_val}'")
+                return env_val
         keys = key_path.split(".")
         with self._lock:  # Ensure thread-safe access to self.config.
             value = _get_nested_value(self.config, keys, default)
